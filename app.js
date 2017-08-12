@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+const fs = require('fs');
 const express = require('express');
 const app = express();
 const NaturalLanguageUnderstandingV1 = require('watson-developer-cloud/natural-language-understanding/v1.js');
-const nlu = new NaturalLanguageUnderstandingV1(require('./nlu.json'));
+const key = JSON.parse(fs.readFileSync('./nlu.json', 'utf8'));
+const nlu = new NaturalLanguageUnderstandingV1(key);
 const Translate = require('@google-cloud/translate');
 const translateClient = Translate({
   projectId: 'aerial-day-140310',
@@ -88,8 +89,8 @@ app.get('/users', function (req, res) {
   res.end();
 });
 app.post('/analyze', function (req, res) {
-  console.log(req.body);
   req.body.timestamp = new Date();
+  console.log(req.body);
   translateClient.translate(req.body.data, 'en')
     .then((results) => {
       const translation = results[0];
