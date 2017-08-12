@@ -94,8 +94,8 @@ app.post('/analyze', function (req, res) {
   translateClient.translate(req.body.data, 'en')
     .then((results) => {
       const translation = results[0];
-      let cate, key = false;
-
+      let cate = false;
+      let key = false;
       nlu.analyze(param(translation), (err, results) => {
         if (!err) {
           target["emotion"] = results.emotion.document.emotion;
@@ -131,17 +131,17 @@ app.post('/analyze', function (req, res) {
                   "text": translationKey,
                   "relevance": results.keywords[i].relevance,
                   "emotion": JSON.stringify(results.keywords[i].emotion),
-                  "frequency": getIndicesOf(results.keywords[i].text, translation).length
+                  "frequency": getIndicesOf(results.keywords[i].text, translation, false).length
                 });
                 if (target.keywords.length == results.keywords.length) {
                   let byRelevance = target.keywords.slice(0);
                   byRelevance.sort(function (a, b) {
-                    return b.frequency - a.frequency;
+                    return b.relevance - a.relevance;
                   });
                   target.keywords = byRelevance;
                   key = true;
                 }
-                if (cate && key) {
+                if (key) {
                   res.writeHead(200, {
                     "Content-Type": "application/json; charset=utf-8"
                   });
@@ -158,6 +158,8 @@ app.post('/analyze', function (req, res) {
           console.log("ERROR:" + err);
         }
       });
+
+
     })
     .catch((err) => {
       console.error('ERROR:', err);
