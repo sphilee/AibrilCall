@@ -17,7 +17,7 @@
 const express = require('express');
 const app = express();
 const NaturalLanguageUnderstandingV1 = require('watson-developer-cloud/natural-language-understanding/v1.js');
-const nlu = new NaturalLanguageUnderstandingV1('./nlu.json');
+const nlu = new NaturalLanguageUnderstandingV1(require('./nlu.json'));
 const Translate = require('@google-cloud/translate');
 const translateClient = Translate({
   projectId: 'aerial-day-140310',
