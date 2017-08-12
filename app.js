@@ -17,11 +17,7 @@
 const express = require('express');
 const app = express();
 const NaturalLanguageUnderstandingV1 = require('watson-developer-cloud/natural-language-understanding/v1.js');
-const nlu = new NaturalLanguageUnderstandingV1({
-	username: 'ba0f03e1-6476-4e15-8ea2-e05c8b59737e',
-	password: 'NevXffRKUUjN',
-  version_date: NaturalLanguageUnderstandingV1.VERSION_DATE_2016_01_23
-});
+const nlu = new NaturalLanguageUnderstandingV1('./nlu.json');
 const Translate = require('@google-cloud/translate');
 const translateClient = Translate({
   projectId: 'aerial-day-140310',
@@ -66,8 +62,8 @@ const param = (text) => {
 const mongoose = require('mongoose');
 const db = mongoose.connection;
 db.on('error', console.error);
-db.once('open',function(){
-	console.log("Connected to mongod server");
+db.once('open', function () {
+  console.log("Connected to mongod server");
 });
 mongoose.connect('mongodb://localhost/mongodb_tutorial');
 mongoose.Promise = global.Promise;
@@ -84,13 +80,16 @@ const router = require('./routes')(app, Book);
 app.get('/', function (req, res) {
   res.render('index');
 });
-app.get('/users', function(req,res) {
-	res.writeHead(200,{"Content-Type":"application/json; charset=utf-8"});
-	res.write(JSON.stringify(require('./users.json')));
-	res.end();
+app.get('/users', function (req, res) {
+  res.writeHead(200, {
+    "Content-Type": "application/json; charset=utf-8"
+  });
+  res.write(JSON.stringify(require('./users.json')));
+  res.end();
 });
 app.post('/analyze', function (req, res) {
   console.log(req.body);
+  req.body.timestamp = new Date();
   translateClient.translate(req.body.data, 'en')
     .then((results) => {
       const translation = results[0];
@@ -147,7 +146,7 @@ app.post('/analyze', function (req, res) {
                   });
                   res.write(JSON.stringify(target));
                   res.end();
-		  console.log(target);
+                  console.log(target);
                 }
               })
               .catch((err) => {
