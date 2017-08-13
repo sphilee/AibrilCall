@@ -90,6 +90,7 @@ app.get('/users', function (req, res) {
 });
 app.post('/analyze', function (req, res) {
   req.body.timestamp = new Date();
+  req.body.timestamp.setHours(req.body.timestamp.getHours() + 9);
   console.log(req.body);
   translateClient.translate(req.body.data, 'en')
     .then((results) => {
