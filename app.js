@@ -74,15 +74,8 @@ require('./config/express')(app);
 
 const router = require('./routes')(app, Book);
 
-app.get('/', function (req, res) {
-  res.render('index');
-});
 app.get('/users', function (req, res) {
-  res.writeHead(200, {
-    "Content-Type": "application/json; charset=utf-8"
-  });
-  res.write(JSON.stringify(require('./users.json')));
-  res.end();
+  res.json(require('./users.json'));
 });
 app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
   Book.find({
@@ -166,7 +159,6 @@ app.post('/analyze', function (req, res) {
                   keyBool = true;
                 }
                 if (keyBool) {
-
                   let book = new Book();
                   book.number = req.body.number;
                   book.name = req.body.name;
@@ -177,16 +169,13 @@ app.post('/analyze', function (req, res) {
 
                   book.save(function (err) {
                     if (err) {
-                      console.error(err);
-                      res.json({
-                        result: 0
-                      });
+                      res.writeHead(404);
+                      res.end(JSON.stringify(err));
                       return;
                     }
 
-                    res.json({
-                      result: 1
-                    });
+                    res.writeHead(200);
+                    res.end("success");
 
                   });
                 }
@@ -206,22 +195,25 @@ app.post('/analyze', function (req, res) {
       console.error('ERROR:', err);
     });
 });
-app.post('/api/analyze', function (req, res, next) {
-  if (process.env.SHOW_DUMMY_DATA) {
-    res.json(require('./payload.json'));
-  } else {
-    nlu.analyze(req.body, (err, results) => {
-      if (err) {
-        return next(err);
-      } else {
-        res.json({
-          query: req.body.query,
-          results
-        });
-      }
-    });
-  }
-});
+// app.get('/', function (req, res) {
+//   res.render('index');
+// });
+// app.post('/api/analyze', function (req, res, next) {
+//   if (process.env.SHOW_DUMMY_DATA) {
+//     res.json(require('./payload.json'));
+//   } else {
+//     nlu.analyze(req.body, (err, results) => {
+//       if (err) {
+//         return next(err);
+//       } else {
+//         res.json({
+//           query: req.body.query,
+//           results
+//         });
+//       }
+//     });
+//   }
+// });
 
 // error-handler settings
 require('./config/error-handler')(app);
