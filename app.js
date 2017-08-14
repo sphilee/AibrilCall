@@ -24,6 +24,20 @@ const translateClient = Translate({
   projectId: 'aerial-day-140310',
   keyFilename: './test.json'
 });
+const param = (text) => {
+  let parameters = {
+    features: {
+      'keywords': {
+        'emotion': true
+      },
+      'categories': {},
+      'sentiment': {},
+      'emotion': {}
+    },
+    text
+  };
+  return parameters;
+};
 const getIndicesOf = (searchStr, str, caseSensitive) => {
   var searchStrLen = searchStr.length;
   if (searchStrLen == 0) {
@@ -41,24 +55,6 @@ const getIndicesOf = (searchStr, str, caseSensitive) => {
   }
   return indices;
 }
-let target = {
-  "keywords": [],
-  "categories": []
-};
-const param = (text) => {
-  let parameters = {
-    features: {
-      'keywords': {
-        'emotion': true
-      },
-      'categories': {},
-      'sentiment': {},
-      'emotion': {}
-    },
-    text
-  };
-  return parameters;
-};
 // setup mongodb server
 const mongoose = require('mongoose');
 const db = mongoose.connection;
@@ -89,9 +85,11 @@ app.get('/users', function (req, res) {
   res.end();
 });
 app.post('/analyze', function (req, res) {
-  req.body.timestamp = new Date();
-  req.body.timestamp.setHours(req.body.timestamp.getHours() + 9);
   console.log(req.body);
+  let target = {
+    "keywords": [],
+    "categories": []
+  };
   translateClient.translate(req.body.data, 'en')
     .then((results) => {
       const translation = results[0];
@@ -143,16 +141,29 @@ app.post('/analyze', function (req, res) {
                   keyBool = true;
                 }
                 if (keyBool) {
-                  res.writeHead(200, {
-                    "Content-Type": "application/json; charset=utf-8"
+
+                  let book = new Book();
+                  book.number = req.body.number;
+                  book.name = req.body.name;
+                  book.data = req.body.data;
+                  book.opponentNumber = req.body.opponentNumber;
+                  book.time = req.body.time;
+                  book.analyzed = JSON.stringify(target);
+
+                  book.save(function (err) {
+                    if (err) {
+                      console.error(err);
+                      res.json({
+                        result: 0
+                      });
+                      return;
+                    }
+
+                    res.json({
+                      result: 1
+                    });
+
                   });
-                  res.write(JSON.stringify(target));
-                  res.end();
-                  // console.log(target);
-                  target = {
-                    "keywords": [],
-                    "categories": []
-                  };
                 }
               })
               .catch((err) => {

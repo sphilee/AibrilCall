@@ -28,7 +28,6 @@ module.exports = function(app, Book)
 
     // CREATE BOOK
     app.post('/api/books', function(req, res){
-	    console.log(req.body);
         var book = new Book();
         book.title = req.body.title;
         book.author = req.body.author;
