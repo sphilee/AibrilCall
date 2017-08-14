@@ -76,6 +76,10 @@ app.get('/users', function (req, res) {
   res.json(require('./users.json'));
 });
 app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
+  let results = {
+    me: {},
+    you: {}
+  };
   Book.find({
     'number': {
       $in: [
@@ -91,8 +95,14 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
     if (books.length === 0) return res.status(404).json({
       error: 'data not found'
     });
-    console.log(books);
-    res.json(books);
+    for (let i in books) {
+      if (books[i].number == req.params.number)
+        results.me = books[i].analyzed;
+      else
+        results.you = books[i].analyzed;
+    }
+    console.log(results);
+    res.json(results);
   });
 
 });
