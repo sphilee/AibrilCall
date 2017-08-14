@@ -101,7 +101,6 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
       else
         results.you = books[i].analyzed;
     }
-    console.log(results);
     res.json(results);
   });
 
