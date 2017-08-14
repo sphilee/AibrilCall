@@ -97,9 +97,9 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
     });
     for (let i in books) {
       if (books[i].number == req.params.number)
-        results.me = books[i].analyzed;
+        results.me = JSON.parse(books[i].analyzed);
       else
-        results.you = books[i].analyzed;
+        results.you = JSON.parse(books[i].analyzed);
     }
     res.json(results);
   });
