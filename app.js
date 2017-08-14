@@ -84,6 +84,28 @@ app.get('/users', function (req, res) {
   res.write(JSON.stringify(require('./users.json')));
   res.end();
 });
+app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
+  console.log(req.params);
+
+  Book.find({
+    'number': {
+      $in: [
+        req.params.number,
+        req.params.opponentNumber,
+      ]
+    }
+  }, function (err, books) {
+    if (err) return res.status(500).json({
+      error: err
+    });
+    if (books.length === 0) return res.status(404).json({
+      error: 'data not found'
+    });
+    res.json(books);
+  });
+
+});
+
 app.post('/analyze', function (req, res) {
   console.log(req.body);
   let target = {
