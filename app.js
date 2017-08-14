@@ -27,9 +27,7 @@ const translateClient = Translate({
 const param = (text) => {
   let parameters = {
     features: {
-      'keywords': {
-        'emotion': true
-      },
+      'keywords': {},
       'categories': {},
       'sentiment': {},
       'emotion': {}
@@ -84,7 +82,8 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
         req.params.number,
         req.params.opponentNumber,
       ]
-    }
+    },
+    'time': req.params.time
   }, function (err, books) {
     if (err) return res.status(500).json({
       error: err
@@ -92,12 +91,8 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
     if (books.length === 0) return res.status(404).json({
       error: 'data not found'
     });
-    let result = [];
-    for (let i in books) {
-      if (books[i].time == req.params.time)
-        result.push(books[i]);
-    }
-    res.json(result);
+    console.log(books);
+    res.json(books);
   });
 
 });
@@ -147,7 +142,7 @@ app.post('/analyze', function (req, res) {
                 target.keywords.push({
                   "text": translationKey,
                   "relevance": results.keywords[i].relevance,
-                  "emotion": JSON.stringify(results.keywords[i].emotion),
+                  "emotion": results.keywords[i].emotion,
                   "frequency": getIndicesOf(results.keywords[i].text, translation, false).length
                 });
                 if (target.keywords.length == results.keywords.length) {
