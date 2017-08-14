@@ -85,8 +85,6 @@ app.get('/users', function (req, res) {
   res.end();
 });
 app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
-  console.log(req.params);
-
   Book.find({
     'number': {
       $in: [
@@ -101,7 +99,13 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
     if (books.length === 0) return res.status(404).json({
       error: 'data not found'
     });
-    res.json(books);
+    let result = [];
+    console.log(books);
+    for (let i in books) {
+      if (books[i].time = req.params.time)
+        result.push(books[i]);
+    }
+    res.json(result);
   });
 
 });
