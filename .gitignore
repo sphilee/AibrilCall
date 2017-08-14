@@ -8,3 +8,5 @@ logs/
 coverage/
 .idea
 .vscode
+nlu.json
+test.json

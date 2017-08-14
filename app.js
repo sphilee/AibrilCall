@@ -100,9 +100,8 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
       error: 'data not found'
     });
     let result = [];
-    console.log(books);
     for (let i in books) {
-      if (books[i].time = req.params.time)
+      if (books[i].time == req.params.time)
         result.push(books[i]);
     }
     res.json(result);
