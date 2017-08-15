@@ -87,7 +87,13 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
         req.params.opponentNumber,
       ]
     },
-    'time': req.params.time
+    'time': {
+      $in: [
+        (parseInt(req.params.time) - 1).toString,
+        req.params.time,
+        (parseInt(req.params.time) + 1).toString,
+      ]
+    }
   }, function (err, books) {
     if (err) return res.status(500).json({
       error: err
