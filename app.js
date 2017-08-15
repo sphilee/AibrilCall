@@ -86,10 +86,6 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
         req.params.number,
         req.params.opponentNumber,
       ]
-    },
-    'time': {
-      $gte: parseInt(req.params.time) - 1,
-      $lte: parseInt(req.params.time) + 1
     }
   }, function (err, books) {
     if (err) return res.status(500).json({
@@ -99,10 +95,12 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
       error: 'data not found'
     });
     for (let i in books) {
+	    if(books[i].time <= parseInt(req.params.time)+1 && books[i].time >= parseInt(req.params.time)-1){
       if (books[i].number == req.params.number)
         results.me = JSON.parse(books[i].analyzed);
       else
         results.you = JSON.parse(books[i].analyzed);
+	    }
     }
     res.json(results);
   });
