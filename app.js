@@ -95,12 +95,12 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
       error: 'data not found'
     });
     for (let i in books) {
-	    if(books[i].time <= parseInt(req.params.time)+1 && books[i].time >= parseInt(req.params.time)-1){
-      if (books[i].number == req.params.number)
-        results.me = JSON.parse(books[i].analyzed);
-      else
-        results.you = JSON.parse(books[i].analyzed);
-	    }
+      if (books[i].time <= parseInt(req.params.time) + 1 && books[i].time >= parseInt(req.params.time) - 1) {
+        if (books[i].number == req.params.number)
+          results.me = JSON.parse(books[i].analyzed);
+        else
+          results.you = JSON.parse(books[i].analyzed);
+      }
     }
     res.json(results);
   });
@@ -166,7 +166,6 @@ app.post('/analyze', function (req, res) {
                 if (keyBool) {
                   let book = new Book();
                   book.number = req.body.number;
-                  book.name = req.body.name;
                   book.data = req.body.data;
                   book.opponentNumber = req.body.opponentNumber;
                   book.time = req.body.time;

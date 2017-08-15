@@ -3,7 +3,6 @@ var Schema = mongoose.Schema;
 
 var bookSchema = new Schema({
     number: String,
-    name: String,
     data: String,
     opponentNumber: String,
     time: Number,
