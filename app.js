@@ -88,11 +88,8 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
       ]
     },
     'time': {
-      $in: [
-        (parseInt(req.params.time) - 1).toString,
-        req.params.time,
-        (parseInt(req.params.time) + 1).toString,
-      ]
+      $gte: parseInt(req.params.time) - 1,
+      $lte: parseInt(req.params.time) + 1
     }
   }, function (err, books) {
     if (err) return res.status(500).json({

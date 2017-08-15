@@ -6,7 +6,7 @@ var bookSchema = new Schema({
     name: String,
     data: String,
     opponentNumber: String,
-    time: String,
+    time: Number,
     analyzed: String
 });
 
