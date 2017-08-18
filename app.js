@@ -107,28 +107,28 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
     }
     nlu.analyze(param(combinedText), (err, nlu) => {
       if (!err) {
-        let keywords = [];
+        let target = { "keywords": [] };
         let keyBool = false;
 
         for (let i in nlu.keywords) {
           translateClient.translate(nlu.keywords[i].text, 'ko')
             .then((resultsTranslate) => {
               const translationKey = resultsTranslate[0];
-              keywords.push({
+              target.keywords.push({
                 "text": translationKey,
                 "relevance": nlu.keywords[i].relevance,
                 "frequency": getIndicesOf(nlu.keywords[i].text, combinedText, false).length
               });
-              if (keywords.length == nlu.keywords.length) {
-                let byRelevance = keywords.slice(0);
+              if (target.keywords.length == nlu.keywords.length) {
+                let byRelevance = target.keywords.slice(0);
                 byRelevance.sort(function (a, b) {
                   return b.relevance - a.relevance;
                 });
-                keywords = byRelevance;
+                target.keywords = byRelevance;
                 keyBool = true;
               }
               if (keyBool) {
-                results.our = JSON.parse(keywords);
+                results.our = JSON.parse(target);
               }
             });
         }
