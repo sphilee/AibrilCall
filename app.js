@@ -102,8 +102,7 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
         else
           results.you = JSON.parse(books[i].analyzed);
 
-        console.log(books[i].translation);
-        combinedText.concat(books[i].translation);
+        combinedText += books[i].translation;
       }
     }
     console.log(combinedText);
