@@ -117,7 +117,7 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
               keywords.push({
                 "text": translationKey,
                 "relevance": nlu.keywords[i].relevance,
-                "frequency": getIndicesOf(nlu.keywords[i].text, translation, false).length
+                "frequency": getIndicesOf(nlu.keywords[i].text, combinedText, false).length
               });
               if (keywords.length == nlu.keywords.length) {
                 let byRelevance = keywords.slice(0);
