@@ -7,6 +7,6 @@ const app = require('./app.js');
 // Deployment tracking
 require('cf-deployment-tracker-client').track();
 
-var port = process.env.PORT || process.env.VCAP_APP_PORT || 3000;
+var port = process.env.PORT || process.env.VCAP_APP_PORT || 8080;
 app.listen(port);
 console.log('listening at:', port); // eslint-disable-line

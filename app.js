@@ -105,6 +105,7 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
         combinedText.concat(books[i].translation);
       }
     }
+    console.log(combinedText);
     nlu.analyze(param(combinedText), (err, results) => {
       if (!err) {
         console.log(results);
