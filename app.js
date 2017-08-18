@@ -119,7 +119,6 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
                 "relevance": nlu.keywords[i].relevance,
                 "frequency": getIndicesOf(nlu.keywords[i].text, combinedText, false).length
               });
-              console.log(target.keywords);
               if (target.keywords.length == nlu.keywords.length) {
                 let byRelevance = target.keywords.slice(0);
                 byRelevance.sort(function (a, b) {
@@ -129,8 +128,8 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
                 keyBool = true;
               }
               if (keyBool) {
-                console.log("3", target);
                 results.our = JSON.parse(target);
+                res.json(results);
               }
             });
         }
@@ -139,7 +138,6 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
         console.log("ERROR:" + err);
       }
     });
-    res.json(results);
   });
 
 });
