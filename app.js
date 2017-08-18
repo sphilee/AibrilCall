@@ -28,7 +28,6 @@ const param = (text) => {
   let parameters = {
     features: {
       'keywords': {},
-      'categories': {},
       'sentiment': {},
       'emotion': {}
     },
@@ -94,14 +93,25 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
     if (books.length === 0) return res.status(404).json({
       error: 'data not found'
     });
+    let combinedText = "";
     for (let i in books) {
       if (books[i].time <= parseInt(req.params.time) + 1 && books[i].time >= parseInt(req.params.time) - 1) {
         if (books[i].number == req.params.number)
           results.me = JSON.parse(books[i].analyzed);
         else
           results.you = JSON.parse(books[i].analyzed);
+
+
+        combinedText.concat(books[i].translation);
       }
     }
+    nlu.analyze(param(combinedText), (err, results) => {
+      if (!err) {
+        console.log(results);
+      } else {
+        console.log("ERROR:" + err);
+      }
+    });
     res.json(results);
   });
 
@@ -167,6 +177,7 @@ app.post('/analyze', function (req, res) {
                   let book = new Book();
                   book.number = req.body.number;
                   book.data = req.body.data;
+                  book.translation = translation;
                   book.opponentNumber = req.body.opponentNumber;
                   book.time = req.body.time;
                   book.analyzed = JSON.stringify(target);
