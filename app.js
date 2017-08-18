@@ -105,14 +105,38 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
         combinedText += books[i].translation;
       }
     }
-    console.log(combinedText);
-    // nlu.analyze(param(combinedText), (err, results) => {
-    //   if (!err) {
-    //     console.log(results);
-    //   } else {
-    //     console.log("ERROR:" + err);
-    //   }
-    // });
+    nlu.analyze(param(combinedText), (err, nlu) => {
+      if (!err) {
+        let keywords = [];
+        let keyBool = false;
+
+        for (let i in nlu.keywords) {
+          translateClient.translate(nlu.keywords[i].text, 'ko')
+            .then((resultsTranslate) => {
+              const translationKey = resultsTranslate[0];
+              keywords.push({
+                "text": translationKey,
+                "relevance": nlu.keywords[i].relevance,
+                "frequency": getIndicesOf(nlu.keywords[i].text, translation, false).length
+              });
+              if (keywords.length == nlu.keywords.length) {
+                let byRelevance = keywords.slice(0);
+                byRelevance.sort(function (a, b) {
+                  return b.relevance - a.relevance;
+                });
+                keywords = byRelevance;
+                keyBool = true;
+              }
+              if (keyBool) {
+                results.our = JSON.parse(keywords);
+              }
+            });
+        }
+
+      } else {
+        console.log("ERROR:" + err);
+      }
+    });
     res.json(results);
   });
 
