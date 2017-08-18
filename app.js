@@ -77,7 +77,8 @@ app.get('/users', function (req, res) {
 app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
   let results = {
     me: {},
-    you: {}
+    you: {},
+    our: {}
   };
   Book.find({
     'number': {
@@ -101,18 +102,18 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
         else
           results.you = JSON.parse(books[i].analyzed);
 
-
+        console.log(books[i].translation);
         combinedText.concat(books[i].translation);
       }
     }
     console.log(combinedText);
-    nlu.analyze(param(combinedText), (err, results) => {
-      if (!err) {
-        console.log(results);
-      } else {
-        console.log("ERROR:" + err);
-      }
-    });
+    // nlu.analyze(param(combinedText), (err, results) => {
+    //   if (!err) {
+    //     console.log(results);
+    //   } else {
+    //     console.log("ERROR:" + err);
+    //   }
+    // });
     res.json(results);
   });
 
@@ -120,86 +121,35 @@ app.get('/phone/:number/:opponentNumber/:time', function (req, res) {
 
 app.post('/analyze', function (req, res) {
   console.log(req.body);
-  let target = {
-    "keywords": [],
-    "categories": []
-  };
+  let target = {};
   translateClient.translate(req.body.data, 'en')
     .then((results) => {
       const translation = results[0];
-      let cateBool = false;
-      let keyBool = false;
       nlu.analyze(param(translation), (err, results) => {
         if (!err) {
           target["emotion"] = results.emotion.document.emotion;
           target["sentiment"] = results.sentiment.document;
 
-          for (let i in results.categories) {
-            translateClient.translate(results.categories[i].label, 'ko')
-              .then((resultsTranslate) => {
-                const translationKey = resultsTranslate[0];
+          let book = new Book();
+          book.number = req.body.number;
+          book.data = req.body.data;
+          book.translation = translation;
+          book.opponentNumber = req.body.opponentNumber;
+          book.time = req.body.time;
+          book.analyzed = JSON.stringify(target);
 
-                target.categories.push({
-                  "label": translationKey,
-                  "score": results.categories[i].score
-                });
-                if (target.categories.length == results.categories.length) {
-                  let byRelevance = target.categories.slice(0);
-                  byRelevance.sort(function (a, b) {
-                    return b.relevance - a.relevance;
-                  });
-                  target.categories = byRelevance;
-                  cateBool = true;
-                }
-              })
-              .catch((err) => {
-                console.error('ERROR:', err);
-              });
-          }
-          for (let i in results.keywords) {
-            translateClient.translate(results.keywords[i].text, 'ko')
-              .then((resultsTranslate) => {
-                const translationKey = resultsTranslate[0];
-                target.keywords.push({
-                  "text": translationKey,
-                  "relevance": results.keywords[i].relevance,
-                  "emotion": results.keywords[i].emotion,
-                  "frequency": getIndicesOf(results.keywords[i].text, translation, false).length
-                });
-                if (target.keywords.length == results.keywords.length) {
-                  let byRelevance = target.keywords.slice(0);
-                  byRelevance.sort(function (a, b) {
-                    return b.relevance - a.relevance;
-                  });
-                  target.keywords = byRelevance;
-                  keyBool = true;
-                }
-                if (keyBool) {
-                  let book = new Book();
-                  book.number = req.body.number;
-                  book.data = req.body.data;
-                  book.translation = translation;
-                  book.opponentNumber = req.body.opponentNumber;
-                  book.time = req.body.time;
-                  book.analyzed = JSON.stringify(target);
+          book.save(function (err) {
+            if (err) {
+              res.writeHead(404);
+              res.end(JSON.stringify(err));
+              return;
+            }
 
-                  book.save(function (err) {
-                    if (err) {
-                      res.writeHead(404);
-                      res.end(JSON.stringify(err));
-                      return;
-                    }
+            res.writeHead(200);
+            res.end("success");
 
-                    res.writeHead(200);
-                    res.end("success");
+          });
 
-                  });
-                }
-              })
-              .catch((err) => {
-                console.error('ERROR:', err);
-              });
-          }
         } else {
           console.log("ERROR:" + err);
         }
